@@ -5,15 +5,16 @@
 // define
 #define INFINITY 2147483647
 
-// global variables
-int num, jumpDistance; // 鳄鱼数 跳跃距离
-
 // typedef
 typedef struct Vertex
 {
     int x;
     int y;
 }Vertex;
+
+// global variables
+int num, jumpDistance; // 鳄鱼数 跳跃距离
+Vertex O;
 
 
 // following are functions
@@ -25,10 +26,6 @@ float getDistance(Vertex V1, Vertex V2)
 
 int firstJump(Vertex V, int jumpDistance)
 {
-    Vertex O;
-    O.x = 0;
-    O.y = 0;
-
     return (getDistance(O, V) <= 7.5 + jumpDistance) ? 1 : 0;
 }
 
@@ -88,7 +85,7 @@ void save()
     }
 
     // 补充D的原点那一行&列
-    for (int i = 1; i < num+2; i++)
+    for (int i = 1; i < num+1; i++)
     {
         if (firstJump(G[i], jumpDistance))
         {
@@ -97,23 +94,25 @@ void save()
         }
         
     }
+    D[0][num+1] = INFINITY;
+    D[num+1][0] = INFINITY;
 
     // 补充D的边缘那一行&列
     for (int i = 0; i < num+1; i++)
     {
         if (isSafe(G[i], jumpDistance))
         {
-            D[i][num] = 1;
-            D[num][i] = 1;
+            D[i][num+1] = 1;
+            D[num+1][i] = 1;
         }
         
     }
     
     // path[i][j]保存从i到j的最短路径，走出的第一步经过的顶点的idx
-    int path[num+1][num+1];
-    for (int i = 0; i < num+1; i++)
+    int path[num+2][num+2];
+    for (int i = 0; i < num+2; i++)
     {
-        for (int j = 0; j < num+1; j++)
+        for (int j = 0; j < num+2; j++)
         {
             path[i][j] = (D[i][j] == 1) ? j : -1;
         }
@@ -121,13 +120,13 @@ void save()
     }
 
     // Floyd
-    for (int i = 0; i < num+2; i++)
+    for (int k = 0; k < num+2; k++)
     {
-        for (int j = 0; j < num+2; j++)
+        for (int i = 0; i < num+2; i++)
         {
-            for (int k = 0; k < num+2; k++)
+            for (int j = 0; j < num+2; j++)
             {
-                if (D[i][j] > D[i][k] + D[k][j])
+                if (D[i][k] != INFINITY && D[k][j] != INFINITY && D[i][j] > D[i][k] + D[k][j])
                 {
                     D[i][j] = D[i][k] + D[k][j];
                     path[i][j] = path[i][k];
@@ -139,17 +138,55 @@ void save()
         
     }
 
-    // 把D[0-(num+1)][num+2]的最小值找出来
-    //      如果只有一个->直接输出
-    //      如果有多个  ->找第一步最短的输出
+    int minDistance = D[0][num+1];
+    if (minDistance == INFINITY)
+    {
+        printf("0\n");
+        return;
+    }
+    else
+    {
+        // 用minFirst记录:以这个点为第一个到达的点为起点到边缘
+        int minFirst[num];
+        int minFirstIdx = 0;
 
-    // 先找最短路径minDistance
-    // 把等于最最短路径的最后一个元素的idx放进数组minFinal
-    // 把数组minFinal里的元素第一个跳到的点找出来 放进数组firstJumpPoint
-    // 找数组B里面第一步最小的idx返回出来
+        for (int i = 1; i < num+1; i++)
+        {
+            if (firstJump(G[i], jumpDistance) && D[i][num+1] == minDistance-1)
+            {
+                minFirst[minFirstIdx++] = i;
+            }
+            
+        }
+
+        // best保存minFirst中 需要输出的那个的下标
+        int best = 0;
+        for (int i = 1; i < minFirstIdx; i++)
+        {
+            if (getDistance(O, G[minFirst[i]]) < getDistance(O, G[minFirst[best]]))
+            {
+                best = i;
+            }
+        }
+        
+        // 输出最短跳跃次数
+        printf("%d\n", minDistance);
+
+        // 输出各个顶点
+        int curr = minFirst[best];
+        while (curr != num+1)
+        {
+            printf("%d %d\n", G[curr].x, G[curr].y);
+            curr = path[curr][num+1];
+        }
+        
+        
+    }
+    
 }
 
 int main()
 {
+    O.x = O.y = 0;
     save();
 }
