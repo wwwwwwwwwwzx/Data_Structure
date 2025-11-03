@@ -172,7 +172,7 @@ scanf("%c");
 
 
 
-#### saving_james_bond_hard(2 days)
+### saving_james_bond_hard(2 days)
 
 > Floyd算法的实现中，中转结点k必须放在最外层循环
 
@@ -194,7 +194,7 @@ scanf("%c");
 
 
 
-#### saving_james_bond_hard_BFS（GEMINI）
+### saving_james_bond_hard_BFS（GEMINI）
 
 > 这段代码是Gemini写的，可以直接AC。忽然发现Gemini的coding蛮厉害的，原先用Floyd的两个Bug都是它找出来的，上下文还挺长的。
 
@@ -207,3 +207,14 @@ scanf("%c");
 > 先把第一跳能跳到的鳄鱼按第一跳从小到大排序，然后把这些鳄鱼入队
 >
 > 之后就是BFS的正常步骤，每一次入队都是按照第一跳从小到大的顺序
+
+
+
+### 旅游规划
+
+> Dijkstra每次都会找Dist最小且为访问过的结点，当找完一个时，这个不一定是最短的，所以会继续循环。循环完才能确定找到最短的。
+
+> 这一题关键在：添加Cost数组。每次如果有多条路径长度相同的，都要选择那个便宜的 -> 用Cost记录从源点到这点的费用
+
+> 这样做并不会导致价格非最少，因为这个逻辑和Dijkstra的逻辑是一样的。
+
